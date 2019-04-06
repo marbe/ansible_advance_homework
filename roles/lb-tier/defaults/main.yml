@@ -2,6 +2,5 @@
 # defaults file for lb-tier
 haproxy:
   packages:
-    - httpie
     - haproxy
   svc: haproxy

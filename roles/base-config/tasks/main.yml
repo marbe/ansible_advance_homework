@@ -1,4 +1,3 @@
 ---
 # tasks file for base-config
-
-# Not necessary, because already done via post install script of osp-servers role
+- debug: msg="the value of internal.repo is {{lookup('file', '/etc/yum.repos.d/internal.repo') }}"
