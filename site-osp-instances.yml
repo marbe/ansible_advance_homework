@@ -1,3 +1,10 @@
+- hosts: localhost
+  tasks:
+  - name: Create workstation inventory
+    add_host:
+       name: workstation-f172.rhpds.opentlc.com
+       group: workstation
+
 - hosts: workstation
   become: yes
   roles:
