@@ -1,2 +1,18 @@
 ---
 # tasks file for lb-tier
+- name: install packages
+  package:
+    name: "{{ item }}"
+    state: latest
+  loop: "{{ haproxy.packages }}"
+
+- name: enable {{ haproxy.svc }}
+  service:
+    name: "{{ haproxy.svc }}"
+    state: started
+
+- name: configure {{ haproxy.svc }}
+  template:
+    src: haproxy.cfg.j2
+    dest: /etc/haproxy/haproxy.cfg
+  notify: HAProxy restart

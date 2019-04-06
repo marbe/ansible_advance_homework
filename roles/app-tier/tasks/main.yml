@@ -1,2 +1,28 @@
 ---
-# tasks file for app-tier
+# tasks file for my-tomcat
+- name: install packages
+  package:
+    name: "{{ item }}"
+    state: latest
+  loop: "{{ tomcat.packages }}"
+
+- name: create deploy directory
+  file:
+    path: /usr/share/tomcat/webapps/{{ item.key }}
+    state: directory
+  when: tomcat_deploy is defined
+  with_dict: "{{ tomcat_deploy }}"
+
+- name: deploy static content to {{ tomcat.svc }} webapps
+  template:
+    src: "{{ item.value }}"
+    dest: /usr/share/tomcat/webapps/{{ item.key }}/index.html
+    mode: 0644
+  when: tomcat_deploy is defined
+  with_dict: "{{ tomcat_deploy }}"
+
+- name: enable {{ tomcat.svc }} at boot
+  service:
+    name: "{{ tomcat.svc }}"
+    state: started
+    enabled: yes

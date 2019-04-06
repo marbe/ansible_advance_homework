@@ -1,2 +1,4 @@
 ---
 # tasks file for base-config
+
+# Not necessary, because already done via post install script of osp-servers role

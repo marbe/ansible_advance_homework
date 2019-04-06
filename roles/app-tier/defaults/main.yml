@@ -1,2 +1,10 @@
 ---
 # defaults file for app-tier
+tomcat:
+  packages:
+    - tomcat
+  svc: tomcat
+
+tomcat_deploy:
+  ROOT: index.html.j2
+  ansible: ansible-index.html.j2

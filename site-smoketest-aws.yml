@@ -1,5 +1,10 @@
 - hosts: frontends
   gather_facts: false
   tasks:
-  - name: Use Uri module for wrting smoke test.
+  - name: Smoke test AWS website
+    command: "http {{item}}"
+    with_items:
+      - "{{ inventory_hostname }}"
+    register: http_resp
+    failed_when: "'Ansible has done its job' not in http_resp.stdout"  
   - name: Fail if 'Ansible has done its job' is not in the page content

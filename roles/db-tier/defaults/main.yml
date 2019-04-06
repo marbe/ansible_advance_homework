@@ -1,2 +1,7 @@
 ---
 # defaults file for db-tier
+postgres:
+  packages:
+    - postgresql-server
+  svc: postgresql
+  datadir: /var/lib/pgsql/data

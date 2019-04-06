@@ -1,2 +1,25 @@
 ---
 # tasks file for db-tier
+- name: install "{{postgres.svc}}"
+  yum:
+    name: "{{ item }}"
+    state: latest
+  loop: "{{postgres.packages}}"
+
+- stat:
+    path: "{{ postgres.datadir }}/base"
+  register: st
+
+- debug:
+    msg: "Need to run initdb"
+  when: st.stat.exists == false
+
+- name: initilize "{{postgres.svc}}"
+  command: postgresql-setup initdb
+  when: st.stat.exists == false
+
+- name: enable "{{postgres.svc}}" at boot
+  service:
+    name: "{{postgres.svc}}"
+    state: started
+    enabled: yes
