@@ -34,3 +34,11 @@
     timeout: 600
   with_dict: "{{ osp_servers }}"
 
+- name: Start servers
+  os_server_action:
+    cloud: ospcloud
+    action: start
+    server: "{{ item.value.name }}"
+    wait: true
+    timeout: 300
+  with_dict: "{{ osp_servers }}"
