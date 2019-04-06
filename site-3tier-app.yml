@@ -16,7 +16,7 @@
 - name: setup app tier
   hosts: apps
   become: yes
-  gather_facts: false
+  gather_facts: true
   roles:
     - {name: base-config, tags: base-config}
     - {name: app-tier, tags: [apps, tomcat]}
@@ -25,7 +25,7 @@
 
 - name: setup database tier
   become: yes
-  gather_facts: falss
+  gather_facts: false
   hosts: appdbs
   roles:
     - {name: base-config, tags: base-config}
