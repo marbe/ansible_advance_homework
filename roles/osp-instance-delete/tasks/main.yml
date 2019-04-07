@@ -1,6 +1,9 @@
 ---
 # tasks file for roles/osp-instance-delete
-  - name: Delete instances
-    debug:
-      msg: "Would delete OSP instances"
-   
+- name: remove an instance
+  os_server:
+    name: "{{ item.value.name }}"
+    state: absent
+    wait: true
+    timeout: 300
+  with_dict: "{{ osp_servers }}"
