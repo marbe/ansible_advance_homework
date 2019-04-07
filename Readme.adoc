@@ -1,25 +1,148 @@
-==== Ansible Tower Config
+= Advanced Deployment with Red Hat Ansible Automation - Homework Assignment
 
+== Solution of assignement
 
-* From the cloned repo run `site-config-tower.yml` playbook to create job templates and workflow template.
+=== Prerequisites - Environments
+
+* OPENTLC environments used for solution testing:
+** Ansible Advanced - Homework
+*** GUID: fb83
+** Ansible Advanced - OpenStack
+*** GUID: 896d
+
+*THESE ENVIRONMENT HAVE BEEN PROVISIONED ON APRIL 7TH AND MUST BE STARTED TO TEST THE ASSIGNEMENT RESULT AS DESCRIBED IN SECTION "CICD Ansible Workflow execution".*
+
+=== Prerequisites - Environments configuration
+
+*ALL THE CONFIGURATION IN THIS PREREQUISITES SECTION HAVE ALREADY BEEN MADE ON PREVIOUS ENVIRONMENTS AND ARE NEEDED JUST IN CASE OF NEW ENVIRONMENTS.*
+
+* Copy of OpenTLC private key to the Ansible Tower Homework Lab bastion host
+[source,text]
+----
+laptop$ export GUID=fb83 && scp ~/.ssh/id_rsa <username-company.com>@bastion.$GUID.example.opentlc.com:/tmp/
+laptop$ export GUID=fb83 && ssh <username-company.com>@bastion.$GUID.example.opentlc.com
+[<username-company.com>@bastion ~]$ sudo -i
+[root@bastion ~]# mv /tmp/id_rsa /root/.ssh/mykey.pem
+[root@bastion ~]# chmod 400 /root/.ssh/mykey.pem
+----
+
+* Connect to Tower environment's bastion and clone automation project repo
+[source,text]
+----
+laptop$ export GUID=fb83 && ssh <username-company.com>@bastion.$GUID.example.opentlc.com
+[<username-company.com>@bastion ~]$ sudo -i
+[root@bastion ~]# git clone https://github.com/marbe/ansible_advance_homework.git
+----
+
+* Setup OSP environment
+[source,text]
+----
+[root@bastion ~]# cd ansible_advance_homework/
+[root@bastion ansible_advance_homework]# export OSP_GUID=896d
+[root@bastion ansible_advance_homework]# ansible-playbook site-setup-workstation.yml \
+-e OSP_GUID=${OSP_GUID} --private-key=/root/.ssh/mykey.pem -u <username-company.com>
+----
+
+* Fix SSH KEY, if necessary, by removing comments:
+[source,text]
+----
+[root@bastion ~]# grep -i ansible .ssh/*
+.ssh/openstack.pem:# BEGIN ANSIBLE MANAGED BLOCK
+.ssh/openstack.pem:# END ANSIBLE MANAGED BLOCK
+.ssh/openstack.pub:# BEGIN ANSIBLE MANAGED BLOCK
+.ssh/openstack.pub:# END ANSIBLE MANAGED BLOCK
+----
+
+* Configure Tower to run workflow with correct inventories and templates
+
+** NOTE: Currently you have to choose AWS region *us-east-1*, because it is hardcoded into provisioning script.
+[source,text]
+----
+[root@bastion ansible_advance_homework]# export TOWER_GUID=fb83 && export OSP_GUID=896d \
+&& export OPENTLC_LOGIN=<username-company.com> && export OPENTLC_PASSWORD='<your openlc account password>' \
+&& export GITHUB_REPO=https://github.com/marbe/ansible_advance_homework \
+&& export JQ_REPO_BASE=http://www.opentlc.com/download/ansible_bootcamp \
+&& REGION=us-east-1 && export RH_MAIL_ID=<email@company.com>
+
+[root@bastion ansible_advance_homework]# ansible-playbook site-config-tower.yml \
+-e tower_GUID=${TOWER_GUID} -e osp_GUID=${OSP_GUID} -e opentlc_login=${OPENTLC_LOGIN} \
+-e path_to_opentlc_key=/root/.ssh/mykey.pem -e param_repo_base=${JQ_REPO_BASE} \
+-e opentlc_password=${OPENTLC_PASSWORD} -e REGION_NAME=${REGION} -e EMAIL=${RH_MAIL_ID} \
+-e github_repo=${GITHUB_REPO}
+----
+
+=== CICD Ansible Workflow execution
+*THIS IS THE ACTION NEEDED TO RUN THE ASSIGNEMENT WORKFLOW*
+
+Run cicd template on Tower:
+
+* Login on one Tower instance [1] and launch workflow template *cicd_workflow*.
+
+[1] es. https://tower1.fb83.example.opentlc.com/#/home
+
+=== Grading
+
+==== Prerequisites
+
+In order to successfully run grading playbook follow these steps as prerequisites:
+
+* In case of existing environments:
+** start OPENTLC environments
+** run CICD Ansible Workflow
+
+* In case of new environments:
+** follow full instructions to:
+*** create OPENTLC environments
+*** run section "Prerequisites - Environments configuration"
+*** run CICD Ansible Workflow
+
+==== Grading Playbook execution
+
+In order to run grading playbook, you need to retrieve GUID of your **production environment**.
+That is the GUID of *Ansible Advanced - Three Tier App* environment provisioned by CICD workflow:
+*2b82* for this assignement environment.
 
 [source,text]
 ----
-[bastion]$ sudo -i
-[bastion]# cd ansible_advance_homework
-[bastion]# TOWER_GUID=<Ansible Tower Homework GUID from mail>
-[bastion]# OSP_GUID=<Openstack for Ansible GUID from mail>
-[bastion]# OPENTLC_LOGIN=<username-company.com>
-[bastion]# OPENTLC_PASSWORD=<your openlc account password>
-[bastion]# GITHUB_REPO=https://github.com/<githubhandler>/ansible_advance_homework
-[bastion]# JQ_REPO_BASE=http://www.opentlc.com/download/ansible_bootcamp
-[bastion]# REGION=<enter region name example us-east-1>
-[bastion]# RH_MAIL_ID=<your mail id for dynamic inventory tag>
-[bastion]# ansible-playbook site-config-tower.yml -e tower_GUID=${TOWER_GUID} -e osp_GUID=${OSP_GUID} -e opentlc_login=${OPENTLC_LOGIN} -e path_to_opentlc_key=/root/.ssh/mykey.pem -e param_repo_base=${JQ_REPO_BASE} -e opentlc_password=${OPENTLC_PASSWORD} -e REGION_NAME=${REGION} -e EMAIL=${RH_MAIL_ID} -e github_repo=${GITHUB_REPO}
+[root@bastion ~]# export OSP_GUID=896d && export ANSIBLE_ADVANCE_GUID=2b82
+[root@bastion ~]# cd ansible_advance_homework/
+[root@bastion ansible_advance_homework]# ansible-playbook grading-script.yml \
+-e "OSP_GUID=${OSP_GUID} ANSIBLE_ADVANCE_GUID=${ANSIBLE_ADVANCE_GUID}"
 ----
 
+Expect to see such an output:
 
-.List of Playbooks
+[source,text]
+----
+PLAY [localhost] *********************************************************************************************************************************************
+
+TASK [Create In-memory Inventory] ****************************************************************************************************************************
+changed: [localhost]
+
+PLAY [workstation] *******************************************************************************************************************************************
+
+...
+
+TASK [Success] ***********************************************************************************************************************************************
+ok: [localhost] => {
+    "msg": "Congrats Yours HW Assignment is completed"
+}
+
+PLAY RECAP ***************************************************************************************************************************************************
+localhost                  : ok=4    changed=2    unreachable=0    failed=0
+workstation-896d.rhpds.opentlc.com : ok=2    changed=1    unreachable=0    failed=0
+----
+
+=== APPENDIX 1 - Environments for assignement
+[%header,cols=2*]
+|===
+| GUID | Environment
+| 896d | Ansible Advanced - OpenStack
+| fb83 | Ansible Advanced - Homework
+| 2b82 | Ansible Advanced - Three Tier App (provisioned by CICD workflow)
+|===
+
+=== APPENDIX 2 - List of playbooks
 [%header,cols=2*]
 |===
 | Files or dir | Purpose
