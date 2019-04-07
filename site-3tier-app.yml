@@ -3,7 +3,7 @@
   roles:
   - name: osp-facts
 
-# Setup yum esternal repo for AWS instances
+# Setup yum esternal repo for AWS instances and ensure internal repo is not on AWS hosts
 
 - hosts: tag_instance_filter_three_tier_app_mbetti_redhat_com
   gather_facts: false

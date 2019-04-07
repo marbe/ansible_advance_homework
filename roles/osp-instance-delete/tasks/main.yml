@@ -6,8 +6,4 @@
     state: absent
     wait: true
     timeout: 300
-  loop:
-    - frontend
-    - app1
-    - app2
-    - db
+  loop: "{{ osp_instances }}"
