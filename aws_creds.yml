@@ -55,14 +55,14 @@
         playbook: site-smoketest-aws.yml
         project: "Homework Assignment"
 
-- name: setup yum repo for AWS instances
-  hosts: "frontends,apps,appdbs"
-  become: true
-  tasks:
-    - name: Copy open_three-tier-app.repo
-      copy:
-        src: open_three-tier-app.repo
-        dest: /etc/yum.repos.d/open_three-tier-app.repo
-        mode: 0644
+# - name: setup yum repo for AWS instances
+#   hosts: "frontends,apps,appdbs"
+#   become: true
+#   tasks:
+#     - name: Copy open_three-tier-app.repo
+#       copy:
+#         src: open_three-tier-app.repo
+#         dest: /etc/yum.repos.d/open_three-tier-app.repo
+#         mode: 0644
 
     
