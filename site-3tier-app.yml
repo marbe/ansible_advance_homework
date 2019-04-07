@@ -2,6 +2,20 @@
   gather_facts: true
   roles:
   - name: osp-facts
+
+# Setup yum esternal repo for AWS instances
+
+- hosts: tag_instance_filter_three_tier_app_mbetti_redhat_com
+  gather_facts: false
+  become: true
+  tasks:
+    - name: Copy open_three-tier-app.repo
+      template:
+        src: open_three-tier-app.repo
+        dest: /etc/yum.repos.d/open_three-tier-app.repo
+        mode: 0644
+      become: true
+
 # Setup front-end load balancer tier
 
 - name: setup load-balancer tier

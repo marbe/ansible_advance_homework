@@ -2,8 +2,12 @@
 # tasks file for roles/osp-instance-delete
 - name: remove an instance
   os_server:
-    name: "{{ item.value.name }}"
+    name: "{{ item }}"
     state: absent
     wait: true
     timeout: 300
-  with_dict: "{{ osp_servers }}"
+  loop:
+    - frontend
+    - app1
+    - app2
+    - db
